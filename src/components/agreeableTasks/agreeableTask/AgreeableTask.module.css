@@ -1,0 +1,76 @@
+.AgreeableTask {
+    margin: 15px !important;
+    padding: 15px !important;
+    max-height: 250px;
+    min-height: 150px;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+}
+
+.Location {
+    color: rgb(118, 171, 245);
+}
+
+.Fade {
+    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
+    max-height: 250px;
+    min-height: 150px;
+    display: flex;
+}
+
+.Main {
+    width: 90%;
+    display: inline-block;
+    flex: 9;
+}
+
+.Side {
+    width: 5%;
+    margin-left: 5%;
+    flex: 1;
+}
+
+.Icon {
+    margin: 0 !important;
+    width: 20px;
+    cursor: pointer;
+}
+
+.Icon:hover {
+    color: white;
+}
+
+.Votes {
+    width: 20px;
+    padding-left: 1x;
+    text-align: center;
+    margin: 0 !important;
+    margin-bottom: 5px !important;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+}
+
+.Button {
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    color: whitesmoke;
+}
+
+.TrashCan {
+    padding: 0 !important;
+    height: 25px !important;
+    width: 25px !important;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+}
+
+.Desc {
+    white-space: normal;
+}

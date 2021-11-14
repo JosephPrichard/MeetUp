@@ -1,0 +1,12 @@
+.Wrapper {
+    background-color: rgb(32,34,37) !important;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding-left: 10px;
+    height: calc(100vh - 35px);
+    float: left;
+}
+
+.GroupPage {
+    white-space: nowrap;
+}

@@ -1,0 +1,29 @@
+.Day {
+    background-color: rgb(47, 49, 54) !important;
+    width: 110px;
+    float: left;
+    border-color: rgb(57, 59, 64) !important;
+    border-style: solid;
+    border-width: 0;
+    border-right-width: 1px;
+    user-select: none;
+    position: relative;
+}
+
+.DayChunk {
+    height: 40px;
+    width: 110x;
+    border-width: 0px;
+    border-bottom-width: 1px;
+    border-style: solid;
+    border-color: rgb(57, 59, 64) !important;
+    position: relative;
+}
+
+.Pt {
+    border-radius: 8px;
+    /* border-style: solid;
+    border-color: rgb(42, 84, 143); */
+    text-align: center;
+    cursor: pointer;
+}

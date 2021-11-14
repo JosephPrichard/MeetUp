@@ -1,0 +1,26 @@
+.SideBar {
+    width: 80px;
+    height: 100vh;
+    border-radius: 0px !important;
+    background-color: rgb(32,34,37) !important;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    float: left;
+}
+
+.Group {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    line-height: 60px;
+    background-color: rgb(55,57,63) !important;
+    cursor: pointer;
+}
+
+.Group:hover {
+    background-color: rgb(96,106,239) !important;
+}
