@@ -9,6 +9,7 @@
     overflow-y: scroll;
     display: inline-block;
     user-select: none;
+    /* word-wrap:initial; */
 }
 
 .TaskTitle {

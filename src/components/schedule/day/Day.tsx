@@ -1,5 +1,7 @@
 import { Paper } from "@mantine/core";
+import axios from "axios";
 import { ReactElement, useState } from "react";
+import { BASE_URL } from "../../../globals";
 import { AT } from "../../agreeableTasks/AgreeableTasks";
 import { PT } from "../Schedule";
 import styles from "./Day.module.css";
@@ -22,13 +24,19 @@ export const Day = (props: Props) => {
                 className={styles.DayChunk}
                 onClick={() => {
                     if (props.selectingAt) {
-                        props.addTask({
-                            id: Math.random().toString(),
-                            at: Object.assign({}, props.selectingAt),
-                            days: props.number,
-                            timeBlockStart: i * 4,
-                            timeBlockDuration: 4
-                        })
+
+                        const body = {
+                            taskId: props.selectingAt.id,
+                            startDay: props.number,
+                            startTime: i * 4,
+                            duration: 4
+                        };
+
+                        axios.post<PT>("/api/placedTask", body, { withCredentials: true, baseURL: BASE_URL })
+                            .then(r => {
+                                console.log("creatept", r.data);
+                                props.addTask(r.data)
+                            });
                     }
                 }}
             />
@@ -45,13 +53,13 @@ export const Day = (props: Props) => {
                         className={styles.Pt}
                         style={{
                             position: "absolute",
-                            height: 10.25 * pt.timeBlockDuration,
-                            top: 10.25 * pt.timeBlockStart,
+                            height: 10.25 * pt.duration,
+                            top: 10.25 * pt.startTime,
                             width: 110,
                             backgroundColor: "rgb(58,114,192)"
                         }}
                     >
-                        { pt.at.name }
+                        { pt.task.name }
                     </div>
                 );
             })}

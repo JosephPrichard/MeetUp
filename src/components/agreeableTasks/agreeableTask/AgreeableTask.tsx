@@ -1,6 +1,8 @@
 import { Button, Paper, Title } from "@mantine/core";
+import axios from "axios";
 import react from "react";
 import { ChevronDown, ChevronUp, X } from "react-feather";
+import { BASE_URL } from "../../../globals";
 import { AT } from "../AgreeableTasks";
 import styles from "./AgreeableTask.module.css"
 
@@ -9,6 +11,7 @@ interface Props {
     showDelete: boolean;
     selected: boolean;
     onClick: () => void;
+    removeTask: (id: string) => void;
 }
 
 export function calcVotes(task: AT) {
@@ -25,8 +28,6 @@ function voteString(task: AT) {
 }
 
 export const AgreeableTask = (props: Props) => {
-
-    console.log(props.task);
 
     return (
         <Paper 
@@ -63,9 +64,18 @@ export const AgreeableTask = (props: Props) => {
                     </button>
                 </div>
             </div>
-            {!props.showDelete || <Button className={styles.TrashCan} color="red">
-                <X size={14}/>
-            </Button>}
+            {!props.showDelete || 
+                <Button 
+                    className={styles.TrashCan} 
+                    color="red"
+                    onClick={() => {
+                        axios.delete<AT>("/api/task?id=" + props.task.id, { withCredentials: true, baseURL: BASE_URL })
+                            .then(r => props.removeTask(props.task.id));
+                    }}
+                >
+                    <X size={14}/>
+                </Button>
+            }
         </Paper>
     );
 }

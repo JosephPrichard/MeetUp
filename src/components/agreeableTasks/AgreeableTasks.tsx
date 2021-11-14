@@ -1,71 +1,10 @@
-import { Button, Input, Modal, Paper, Textarea, TextInput, Title } from "@mantine/core";
-import react, { useState } from "react";
+import { Button, Input, Modal, Paper, Textarea, Title } from "@mantine/core";
+import axios from "axios";
+import react, { useCallback, useEffect, useState } from "react";
 import { Plus, X } from "react-feather";
+import { BASE_URL } from "../../globals";
 import { AgreeableTask, calcVotes } from "./agreeableTask/AgreeableTask";
 import styles from "./AgreeableTasks.module.css";
-
-const sampleTasks = [
-    {
-        id: "id1",
-        name: "Task1",
-        groupId: "Group1",
-        location: "Mexico",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis dui rutrum, blandit metus vitae, porta turpis. Sed aliquam commodo velit. Vestibulum hendrerit, erat ullamcorper vehicula iaculis, tellus felis gravida tellus, ac ultrices est turpis in quam. Nam posuere elit neque, ac finibus massa tempus laoreet.",
-        yesVotes: [],
-        noVotes: ["hi"]
-    },
-    {
-        id: "id2",
-        name: "Task1",
-        groupId: "Group1",
-        location: "Mexico",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis dui rutrum, blandit metus vitae, porta turpis. Sed aliquam commodo velit. Vestibulum hendrerit, erat ullamcorper vehicula iaculis, tellus felis gravida tellus, ac ultrices est turpis in quam. Nam posuere elit neque, ac finibus massa tempus laoreet.",
-        yesVotes: [],
-        noVotes: ["hi"]
-    },
-    {
-        id: "id3",
-        name: "Task1",
-        groupId: "Group1",
-        location: "Mexico",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis dui rutrum, blandit metus vitae, porta turpis. Sed aliquam commodo velit. Vestibulum hendrerit, erat ullamcorper vehicula iaculis, tellus felis gravida tellus, ac ultrices est turpis in quam. Nam posuere elit neque, ac finibus massa tempus laoreet.",
-        yesVotes: [],
-        noVotes: ["hi"]
-    },
-    {
-        id: "id4",
-        name: "Task1",
-        groupId: "Group1",
-        location: "Mexico",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis dui rutrum, blandit metus vitae, porta turpis. Sed aliquam commodo velit. Vestibulum hendrerit, erat ullamcorper vehicula iaculis, tellus felis gravida tellus, ac ultrices est turpis in quam. Nam posuere elit neque, ac finibus massa tempus laoreet.",
-        yesVotes: [],
-        noVotes: ["hi"]
-    },
-    {
-        id: "id5",
-        name: "Task1",
-        groupId: "Group1",
-        location: "Mexico",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis dui rutrum, blandit metus vitae, porta turpis. Sed aliquam commodo velit. Vestibulum hendrerit, erat ullamcorper vehicula iaculis, tellus felis gravida tellus, ac ultrices est turpis in quam. Nam posuere elit neque, ac finibus massa tempus laoreet.",
-        yesVotes: [],
-        noVotes: ["hi"]
-    },
-    {
-        id: "id6",
-        name: "Task2",
-        groupId: "Group2",
-        location: "Canada",
-        link: "http://google.com",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        yesVotes: [],
-        noVotes: []
-    }
-];
 
 export interface AT {
     id: string;
@@ -90,7 +29,18 @@ function sort(tasks: AT[]) {
 
 export const AgreeableTasks = (props: Props) => {
 
-    const [tasks, setTasks] = useState<AT[]>(sort(sampleTasks));
+    const [tasks, setTasks] = useState<AT[]>();
+
+    const addTasks = useCallback((at: AT) => {
+        const newTasks = tasks ? tasks.map(a => a) : [];
+        newTasks.push(at);
+        setTasks(newTasks);
+    }, [tasks]);
+
+    useEffect(() => {
+        axios.get<AT[]>("/api/task?id=" + props.groupId, { withCredentials: true, baseURL: BASE_URL })
+            .then(r => setTasks(sort(r.data)))
+    }, [props.groupId]);
 
     const [name, setName]= useState("");
     const [location, setLocation] = useState("");
@@ -119,7 +69,7 @@ export const AgreeableTasks = (props: Props) => {
                     <X size={14}/>
                 </Button>
             </div> 
-            {tasks.map((task, i) => {
+            {!tasks || tasks.map((task, i) => {
                 return (
                     <AgreeableTask
                         task={task}
@@ -130,6 +80,17 @@ export const AgreeableTasks = (props: Props) => {
                                 props.setSelectingAt(task)
                             } else {
                                 props.setSelectingAt(undefined);
+                            }
+                        }}
+                        removeTask={(id: string) => {
+                            props.setSelectingAt(undefined);
+                            const newTasks = tasks ? tasks.map(a => a) : [];
+                            for (let i = 0; i < newTasks.length; i++) {
+                                if (newTasks[i].id === id) {
+                                    newTasks.splice(i, 1);
+                                    setTasks(newTasks);
+                                    return;
+                                }
                             }
                         }}
                         key={i}
@@ -147,45 +108,55 @@ export const AgreeableTasks = (props: Props) => {
                     modal: { backgroundColor: "rgb(47, 49, 54)" }
                 }}
             >
-                <Input
-                    className={styles.Field}
-                    placeholder="Name"
-                    value={name}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.currentTarget.value)}
-                    styles={{
-                        input: { backgroundColor: "rgb(39,41,44)" }
-                    }}
-                />
-                <Input
-                    className={styles.Field}
-                    placeholder="Location"
-                    value={location}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setLocation(event.currentTarget.value)}
-                    styles={{
-                        input: { backgroundColor: "rgb(39,41,44)" }
-                    }}
-                />
-                <Textarea
-                    placeholder="Description"
-                    value={desc}
-                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setDesc(event.currentTarget.value)}
-                    styles={{
-                        input: { 
-                            backgroundColor: "rgb(39,41,44)",
-                        }
-                    }}
-                    classNames={{
-                        input: styles.Description
-                    }}
-                />
-                <Button 
-                    className={styles.Button}
-                    onClick={() => {
+                <form onSubmit={(e) => {
+                    e.preventDefault();
 
-                    }}
-                >
-                    Create
-                </Button>
+                    const body = {
+                        name: name,
+                        groupId: props.groupId,
+                        location: location,
+                        link: "",
+                        description: desc
+                    }
+
+                    axios.post<AT>("/api/task", body, { withCredentials: true, baseURL: BASE_URL })
+                        .then(r => addTasks(r.data));
+                }}>
+                    <Input
+                        className={styles.Field}
+                        placeholder="Name"
+                        value={name}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.currentTarget.value)}
+                        styles={{
+                            input: { backgroundColor: "rgb(39,41,44)" }
+                        }}
+                    />
+                    <Input
+                        className={styles.Field}
+                        placeholder="Location"
+                        value={location}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setLocation(event.currentTarget.value)}
+                        styles={{
+                            input: { backgroundColor: "rgb(39,41,44)" }
+                        }}
+                    />
+                    <Textarea
+                        placeholder="Description"
+                        value={desc}
+                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setDesc(event.currentTarget.value)}
+                        styles={{
+                            input: { 
+                                backgroundColor: "rgb(39,41,44)",
+                            }
+                        }}
+                        classNames={{
+                            input: styles.Description
+                        }}
+                    />
+                    <Button className={styles.Button} type="submit">
+                        Create
+                    </Button>
+                </form>
             </Modal>
         </Paper>
     );

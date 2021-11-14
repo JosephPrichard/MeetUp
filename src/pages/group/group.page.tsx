@@ -1,22 +1,26 @@
-import react, { useState } from "react";
+import axios from "axios";
+import react, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AgreeableTasks, AT } from "../../components/agreeableTasks/AgreeableTasks";
 import { Group, Groups } from "../../components/groups/Groups";
 import { Schedule } from "../../components/schedule/Schedule";
+import { BASE_URL } from "../../globals";
 import styles from "./Group.page.module.css";
-
-const sampleGroup = {
-    id: "id1",
-    name: "AwesomeGroup",
-    startDate: new Date(2020, 11, 10),
-    days: 10
-}
 
 export const GroupPage = () => {
 
     const { id } = useParams();
 
-    const [group, setGroup] = useState<Group>(sampleGroup);
+    console.log("id", id)
+
+    const [group, setGroup] = useState<Group>();
+
+    console.log(group)
+
+    useEffect(() => {
+        axios.get<Group>("/api/group?id=" + id, { withCredentials: true, baseURL: BASE_URL  })
+            .then(r => setGroup(r.data))
+    }, [id]);
 
     const [selectingAt, setSelectingAt] = useState<AT | undefined>(undefined);
 

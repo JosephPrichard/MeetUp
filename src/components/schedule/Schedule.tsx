@@ -1,52 +1,19 @@
 import { Paper } from "@mantine/core";
-import { ReactElement, useCallback, useState } from "react";
+import axios from "axios";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
+import { BASE_URL } from "../../globals";
 import { AT } from "../agreeableTasks/AgreeableTasks";
 import { Group } from "../groups/Groups";
 import { Day } from "./day/Day";
 import styles from "./Schedule.module.css";
 
-const sampleTasks = [
-    {
-        id: "pt1",
-        at: {
-            id: "id2",
-            name: "Task2",
-            groupId: "Group2",
-            location: "Canada",
-            link: "http://google.com",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            yesVotes: [],
-            noVotes: []
-        },
-        days: 4,
-        timeBlockStart: 8,
-        timeBlockDuration: 4
-    },
-    {
-        id: "pt1",
-        at: {
-            id: "id2",
-            name: "Task2",
-            groupId: "Group2",
-            location: "Canada",
-            link: "http://google.com",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            yesVotes: [],
-            noVotes: []
-        },
-        days: 0,
-        timeBlockStart: 8,
-        timeBlockDuration: 4
-    }
-];
-
 export interface PT {
     id: string;
-    at: AT;
-    days: number;
-    timeBlockStart: number;
-    timeBlockDuration: number;
+    task: AT;
+    startDay: number;
+    startTime: number;
+    duration: number;
 }
 
 const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
@@ -64,20 +31,24 @@ function getTime(num: number) {
 }
 
 interface Props {
-    group: Group;
+    group?: Group;
     selectingAt?: AT;
 }
 
-function getDaysArray(group: Group, pts: PT[]): PT[][] {
+function createEmptyDays(group: Group) {
     const daysArr: PT[][] = [];
-
-    for(let i = 0; i < group.days; i++) {
+    for(let i = 0; i < group.numDays; i++) {
         daysArr.push([]);
     }
+    return daysArr;
+}
+
+function getDaysArray(group: Group, pts: PT[]): PT[][] {
+    const daysArr = createEmptyDays(group);
 
     for(const pt of pts) {
-        if (pt.days < group.days) {
-            daysArr[pt.days].push(pt);
+        if (pt.startDay < group.numDays) {
+            daysArr[pt.startDay].push(pt);
         }
     }
 
@@ -86,15 +57,22 @@ function getDaysArray(group: Group, pts: PT[]): PT[][] {
 
 export const Schedule = (props: Props) => {
 
-    const [tasks, setTasks] = useState<PT[]>(sampleTasks);
+    const [tasks, setTasks] = useState<PT[]>();
+
+    useEffect(() => {
+        if (props.group?.id) {
+            axios.get<PT[]>("/api/placedTask?id=" + props.group.id, { withCredentials: true, baseURL: BASE_URL  })
+                .then(r => setTasks(r.data))
+        }
+    }, [props.group?.id]);
 
     const addTask = useCallback((pt: PT) => {
-        const newTasks = tasks.map(t => t);
+        const newTasks = tasks ? tasks.map(t => t) : [];
         newTasks.push(pt);
         setTasks(newTasks);
     }, [tasks]);
 
-    const dayPts = getDaysArray(props.group, tasks);
+    const dayPts = props.group && tasks ? getDaysArray(props.group, tasks) : [];
 
     const labels: ReactElement[] = [];
     for(let i = 0; i < 24; i++) {
@@ -140,7 +118,7 @@ export const Schedule = (props: Props) => {
                                 key={i} 
                                 name={name} 
                                 number={i}
-                                pts={dayPts[i]}
+                                pts={dayPts[i] ? dayPts[i] : []}
                                 selectingAt={props.selectingAt}
                                 addTask={addTask}
                             />
